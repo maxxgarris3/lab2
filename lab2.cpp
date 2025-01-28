@@ -1,4 +1,4 @@
-//MaxxGarris
+//Maxwell Garris
 //modified by:
 //date:
 //
