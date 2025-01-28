@@ -28,10 +28,14 @@ using namespace std;
 class Global {
     public:
         int xres, yres;
+        int R, G, B;
         float w;
         float dir;
         float pos[2];
         Global() {
+            R = 100;
+            G = 100;
+            B = 100;
             xres = 400;
             yres = 200;
             w = 20.0f;
@@ -126,7 +130,7 @@ void X11_wrapper::set_title()
 {
     //Set the window title bar.
     XMapWindow(dpy, win);
-    XStoreName(dpy, win, "3350 Lab-1");
+    XStoreName(dpy, win, "3350 Lab-2");
 }
 
 bool X11_wrapper::getXPending()
@@ -153,6 +157,21 @@ void X11_wrapper::reshape_window(int width, int height)
     //Window has been resized.
     g.xres = width;
     g.yres = height;
+    if (width < 1000 && width > 300){
+        g.B = (width - 300) / 7 ;
+    }
+    else if ( width < 300){
+        g.B = 0;}
+    else g.B = 200;
+    g.G = 0;
+if (width < 400){
+        g.R = (400 - width) / 3;
+    }
+    else g.R = 0;
+
+
+
+    
     //
     glViewport(0, 0, (GLint)width, (GLint)height);
     glMatrixMode(GL_PROJECTION); glLoadIdentity();
@@ -267,7 +286,7 @@ void render()
     glClear(GL_COLOR_BUFFER_BIT);
     //draw the box
     glPushMatrix();
-    glColor3ub(200, 00, 200);
+    glColor3ub(g.R, g.G, g.B);
     glTranslatef(g.pos[0], g.pos[1], 0.0f);
     glBegin(GL_QUADS);
     glVertex2f(-g.w, -g.w);
