@@ -29,17 +29,21 @@ class Global {
     public:
         int xres, yres;
         int R, G, B;
-        float w;
-        float dir;
+        int count;
+        float w, h;
+        float dir, dirv;
         float pos[2];
         Global() {
             R = 100;
             G = 100;
             B = 100;
+            count = 0;
             xres = 400;
             yres = 200;
-            w = 20.0f;
+            w = 25.0f;
+            h = 25.0f;
             dir = 30.0f;
+            dirv = 5.0f;
             pos[0] = 0.0f+w;
             pos[1] = yres/2.0f;
         }
@@ -50,6 +54,7 @@ class X11_wrapper {
         Display *dpy;
         Window win;
         GLXContext glc;
+        //GC gc;
     public:
         ~X11_wrapper();
         X11_wrapper();
@@ -61,6 +66,8 @@ class X11_wrapper {
         void check_resize(XEvent *e);
         void check_mouse(XEvent *e);
         int check_keys(XEvent *e);
+        //void HitCounter();
+
 } x11;
 
 //Function prototypes
@@ -85,6 +92,7 @@ int main()
         physics();
         render();
         x11.swapBuffers();
+        //x11.HitCounter();
         usleep(200);
     }
     return 0;
@@ -95,6 +103,12 @@ X11_wrapper::~X11_wrapper()
     XDestroyWindow(dpy, win);
     XCloseDisplay(dpy);
 }
+
+//void X11_wrapper::HitCounter() {
+//    char buffer[20];
+//    sprintf(buffer, "Hits: %d", g.count);
+//    XDrawString(dpy, win, gc, 10, 20, buffer, strlen(buffer));
+//}
 
 X11_wrapper::X11_wrapper()
 {
@@ -124,6 +138,7 @@ X11_wrapper::X11_wrapper()
     set_title();
     glc = glXCreateContext(dpy, vi, NULL, GL_TRUE);
     glXMakeCurrent(dpy, win, glc);
+    //gc = XCreateGC(dpy, win, 0, NULL);
 }
 
 void X11_wrapper::set_title()
@@ -168,7 +183,6 @@ if (width < 400){
         g.R = (400 - width) / 3;
     }
     else g.R = 0;
-
 
 
     
@@ -270,11 +284,27 @@ void physics()
     if (g.pos[0] >= (g.xres-g.w)) {
         g.pos[0] = (g.xres-g.w);
         g.dir = -g.dir;
+        g.count++;
     }
     if (g.pos[0] <= g.w) {
         g.pos[0] = g.w;
         g.dir = -g.dir;
+        g.count++;
     }
+
+        g.pos[1] += g.dirv;
+    //vertical physics.
+    if (g.pos[1] >= (g.yres-g.h)) {
+        g.pos[1] = (g.yres-g.h);
+        g.dirv = -g.dirv;
+        g.count++;
+    }
+    if (g.pos[1] <= g.h) {
+        g.pos[1] = g.h;
+        g.dirv = -g.dirv;
+        g.count++;
+    }
+
 
 
 }
@@ -295,6 +325,7 @@ void render()
     glVertex2f( g.w, -g.w);
     glEnd();
     glPopMatrix();
+    //x11.HitCounter();
 }
 
 
