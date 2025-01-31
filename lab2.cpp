@@ -1,6 +1,4 @@
-//Maxwell Garris
-//changes changes changes changes changes!
-//modified by:
+//Modified by: Maxwell
 //date:
 //
 //original author: Gordon Griesel
@@ -22,6 +20,8 @@ using namespace std;
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <GL/glx.h>
+#include "fonts.h"
+
 
 //some structures
 
@@ -54,7 +54,6 @@ class X11_wrapper {
         Display *dpy;
         Window win;
         GLXContext glc;
-        //GC gc;
     public:
         ~X11_wrapper();
         X11_wrapper();
@@ -66,7 +65,6 @@ class X11_wrapper {
         void check_resize(XEvent *e);
         void check_mouse(XEvent *e);
         int check_keys(XEvent *e);
-        //void HitCounter();
 
 } x11;
 
@@ -95,6 +93,7 @@ int main()
         //x11.HitCounter();
         usleep(200);
     }
+    cleanup_fonts();
     return 0;
 }
 
@@ -103,12 +102,6 @@ X11_wrapper::~X11_wrapper()
     XDestroyWindow(dpy, win);
     XCloseDisplay(dpy);
 }
-
-//void X11_wrapper::HitCounter() {
-//    char buffer[20];
-//    sprintf(buffer, "Hits: %d", g.count);
-//    XDrawString(dpy, win, gc, 10, 20, buffer, strlen(buffer));
-//}
 
 X11_wrapper::X11_wrapper()
 {
@@ -138,7 +131,6 @@ X11_wrapper::X11_wrapper()
     set_title();
     glc = glXCreateContext(dpy, vi, NULL, GL_TRUE);
     glXMakeCurrent(dpy, win, glc);
-    //gc = XCreateGC(dpy, win, 0, NULL);
 }
 
 void X11_wrapper::set_title()
@@ -275,6 +267,9 @@ void init_opengl(void)
     glOrtho(0, g.xres, 0, g.yres, -1, 1);
     //Set the screen background color
     glClearColor(0.1, 0.1, 0.1, 1.0);
+
+    glEnable(GL_TEXTURE_2D);
+    initialize_fonts();
 }
 
 void physics()
@@ -312,8 +307,6 @@ void physics()
 void render()
 {
 
-    //clear the window
-    glClear(GL_COLOR_BUFFER_BIT);
     //draw the box
     glPushMatrix();
     glColor3ub(g.R, g.G, g.B);
@@ -325,7 +318,17 @@ void render()
     glVertex2f( g.w, -g.w);
     glEnd();
     glPopMatrix();
-    //x11.HitCounter();
+
+    Rect r;
+    //
+    r.bot =g.yres - 20;
+    r.left = 10;
+    r.center = 0;
+    ggprint8b(&r, 16, 0x00ff0000, "3350 - Lab-2");
+    ggprint8b(&r, 16, 0x00ffff00, "Esc to exit");
+    ggprint8b(&r, 16, 0x00ffff00, "Q speed up");
+    ggprint8b(&r, 16, 0x00ffff00, "A slow down");
+
 }
 
 
